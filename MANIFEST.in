@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include komal_scientific *.css
+recursive-include komal_scientific *.csv
+recursive-include komal_scientific *.html
+recursive-include komal_scientific *.ico
+recursive-include komal_scientific *.js
+recursive-include komal_scientific *.json
+recursive-include komal_scientific *.md
+recursive-include komal_scientific *.png
+recursive-include komal_scientific *.py
+recursive-include komal_scientific *.svg
+recursive-include komal_scientific *.txt
+recursive-exclude komal_scientific *.pyc
