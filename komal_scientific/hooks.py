@@ -137,13 +137,12 @@ app_license = "gpl-3.0"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"Sales Invoice": {
+		"before_naming": "komal_scientific.komal_scientific.doc_events.sales_invoice.autoname",
+		"autoname": "komal_scientific.komal_scientific.doc_events.sales_invoice.autoname",
+	},
+}
 
 # Scheduled Tasks
 # ---------------
