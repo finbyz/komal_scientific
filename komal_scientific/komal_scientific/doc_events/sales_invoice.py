@@ -20,7 +20,7 @@ def autoname(self, method):
     fy = get_fiscal_year(nowdate(), company=self.company)[0]
     start, end = fy.split("-")
     formatted_fy = f"{start[-2:]}-{end[-2:]}"
-	date = self.get("posting_date") or nowdate()
+    date = self.get("posting_date") or nowdate()
     month = getdate(date).strftime("%b").upper()
 
     self.name = make_autoname(f"{formatted_fy}/{month}/.####")
