@@ -139,7 +139,7 @@ app_license = "gpl-3.0"
 
 doc_events = {
 	"Sales Invoice": {
-		"before_naming": "komal_scientific.komal_scientific.doc_events.sales_invoice.autoname",
+		# "before_naming": "komal_scientific.komal_scientific.doc_events.sales_invoice.autoname",
 		"autoname": "komal_scientific.komal_scientific.doc_events.sales_invoice.autoname",
 	},
 }
