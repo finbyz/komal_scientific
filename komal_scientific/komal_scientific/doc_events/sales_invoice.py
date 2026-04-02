@@ -14,7 +14,7 @@ def before_naming(doc, method=None):
 
     # Resolve date
     date = (
-        or doc.get("posting_date")
+        doc.get("posting_date")
         or getdate()
     )
     d = getdate(date)
