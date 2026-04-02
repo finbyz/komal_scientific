@@ -1,7 +1,7 @@
 import frappe
 from erpnext.accounts.utils import get_fiscal_year
 from frappe.utils import cint, getdate
-from frappe.model.naming import getseries, make_autoname
+from frappe.model.naming import getseries
 
 
 def before_naming(doc, method=None):
@@ -19,7 +19,7 @@ def before_naming(doc, method=None):
     )
     d = getdate(date)
 
-    # Stamp fiscal fields on the document
+    # Stamp fiscal fields
     try:
         fiscal_year = get_fiscal_year(date)[0]
         doc.fiscal_year = fiscal_year
@@ -27,33 +27,27 @@ def before_naming(doc, method=None):
     except Exception:
         pass
 
-    # Resolve {FY} and .MM. tokens
     if "{FY}" in naming_series or ".MM." in naming_series:
-        fiscal     = _get_fiscal(date)            # "26-27"
-        month_abbr = d.strftime("%b").upper()     # "APR"
+        fiscal     = _get_fiscal(date)         # "26-27"
+        month_abbr = d.strftime("%b").upper()  # "APR"
 
-        # Replace both tokens
+        # Resolve tokens but KEEP .#### so Frappe handles the counter
         resolved = (
             naming_series
             .replace("{FY}", fiscal)
             .replace(".MM.", month_abbr)
-            .replace(".####", "")                 # strip counter placeholder
         )
-        # resolved = "26-27/APR/"
+        # resolved = "26-27/APR/.####"
+        # Overwrite naming_series on the doc — Frappe's autoname reads this
+        doc.naming_series = resolved
 
-        # Seed counter if series_value is explicitly provided
+        # Seed counter if series_value provided
         if cint(doc.get("series_value", 0)) > 0:
-            _seed_series(resolved, cint(doc.series_value))
-
-        doc.name = getseries(resolved, 4)         # → 26-27/APR/0001
-
-    else:
-        # Standard patterns like CN/26-27/.#### pass through normally
-        doc.name = make_autoname(naming_series, doc=doc)
+            series_key = resolved.replace(".####", "")
+            _seed_series(series_key, cint(doc.series_value))
 
 
 def _get_fiscal(date):
-    """Returns short fiscal year e.g. '26-27' (April–March cycle)."""
     d = getdate(date)
     if d.month >= 4:
         return f"{str(d.year)[-2:]}-{str(d.year + 1)[-2:]}"
@@ -62,10 +56,6 @@ def _get_fiscal(date):
 
 
 def _seed_series(series_key, series_value):
-    """
-    Seeds tabSeries so the next getseries() call produces series_value.
-    Sets current = series_value - 1 because Frappe increments before use.
-    """
     current = frappe.db.get_value("Series", series_key, "current", order_by="name")
 
     if current is None:
