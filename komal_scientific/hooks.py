@@ -240,7 +240,12 @@ doc_events = {
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
-
+fixtures = [
+    {
+        "dt": "Property Setter",
+        "filters": {"name": ["in", ["Sales Invoice-main-naming_rule","Sales Invoice-naming_series-options"]]},
+    }
+]
 # Translation
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
