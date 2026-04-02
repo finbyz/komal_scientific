@@ -1,26 +1,81 @@
-from frappe.utils import nowdate, now_datetime
+import frappe
 from erpnext.accounts.utils import get_fiscal_year
-from frappe.model.naming import NamingSeries, make_autoname
+from frappe.utils import cint, getdate
+from frappe.model.naming import getseries, make_autoname
 
-def before_naming(self, method):
-    if self.get("name"):
+
+def before_naming(doc, method=None):
+    if doc.get("amended_from") or doc.get("name"):
         return
 
-    date = self.get("posting_date") or nowdate()
-    fy = get_fiscal_year(date, company=self.company)[0]
-    start, end = fy.split("-")
-    formatted_fy = f"{start[-2:]}-{end[-2:]}"
+    naming_series = doc.get("naming_series")
+    if not naming_series:
+        return
 
-    month = getdate(date).strftime("%b").upper()
-    self.naming_series = f"{formatted_fy}/{month}/"
+    # Resolve date
+    date = (
+        or doc.get("posting_date")
+        or getdate()
+    )
+    d = getdate(date)
+
+    # Stamp fiscal fields on the document
+    try:
+        fiscal_year = get_fiscal_year(date)[0]
+        doc.fiscal_year = fiscal_year
+        doc.fiscal = _get_fiscal(date)
+    except Exception:
+        pass
+
+    # Resolve {FY} and .MM. tokens
+    if "{FY}" in naming_series or ".MM." in naming_series:
+        fiscal     = _get_fiscal(date)            # "26-27"
+        month_abbr = d.strftime("%b").upper()     # "APR"
+
+        # Replace both tokens
+        resolved = (
+            naming_series
+            .replace("{FY}", fiscal)
+            .replace(".MM.", month_abbr)
+            .replace(".####", "")                 # strip counter placeholder
+        )
+        # resolved = "26-27/APR/"
+
+        # Seed counter if series_value is explicitly provided
+        if cint(doc.get("series_value", 0)) > 0:
+            _seed_series(resolved, cint(doc.series_value))
+
+        doc.name = getseries(resolved, 4)         # → 26-27/APR/0001
+
+    else:
+        # Standard patterns like CN/26-27/.#### pass through normally
+        doc.name = make_autoname(naming_series, doc=doc)
 
 
-def autoname(self, method):
-    print("autoname called")
-    fy = get_fiscal_year(nowdate(), company=self.company)[0]
-    start, end = fy.split("-")
-    formatted_fy = f"{start[-2:]}-{end[-2:]}"
+def _get_fiscal(date):
+    """Returns short fiscal year e.g. '26-27' (April–March cycle)."""
+    d = getdate(date)
+    if d.month >= 4:
+        return f"{str(d.year)[-2:]}-{str(d.year + 1)[-2:]}"
+    else:
+        return f"{str(d.year - 1)[-2:]}-{str(d.year)[-2:]}"
 
-    month = now_datetime().strftime("%b").upper()
 
-    self.name = make_autoname(f"{formatted_fy}/{month}/.####")
+def _seed_series(series_key, series_value):
+    """
+    Seeds tabSeries so the next getseries() call produces series_value.
+    Sets current = series_value - 1 because Frappe increments before use.
+    """
+    current = frappe.db.get_value("Series", series_key, "current", order_by="name")
+
+    if current is None:
+        frappe.db.sql(
+            "INSERT INTO `tabSeries` (name, current) VALUES (%s, %s)",
+            (series_key, 0)
+        )
+
+    if current != 0 or series_value > 1:
+        frappe.db.sql(
+            "UPDATE `tabSeries` SET current = %s WHERE name = %s",
+            (series_value - 1, series_key)
+        )
