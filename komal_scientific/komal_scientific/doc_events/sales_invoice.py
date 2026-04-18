@@ -16,11 +16,25 @@ def before_naming(self, method):
 
 
 def autoname(self, method):
-    print("autoname called")
-    fy = get_fiscal_year(nowdate(), company=self.company)[0]
+    date = self.get("posting_date") or nowdate()
+
+    fy = get_fiscal_year(date, company=self.company)[0]
     start, end = fy.split("-")
     formatted_fy = f"{start[-2:]}-{end[-2:]}"
-    date = self.get("posting_date") or nowdate()
+    
+    # Return / Credit Note
+    if self.is_return:
+        self.naming_series = f"CN/{formatted_fy}/.####"
+        self.name = make_autoname(self.naming_series)
+        return
+
     month = getdate(date).strftime("%b").upper()
 
-    self.name = make_autoname(f"{formatted_fy}/{month}/.####")
+    # Counter keyed to FY only (e.g. "26-27/")
+    series_number = make_autoname(f"{formatted_fy}/.####")
+
+    # Extract numeric part
+    numeric_part = series_number.split("/")[-1]  # e.g. 0022
+
+    # Final name with month injected visually
+    self.name = f"{formatted_fy}/{month}/{numeric_part}"  # 26-27/MAY/0022
