@@ -1,0 +1,114 @@
+{
+ "actions": [],
+ "creation": "2026-04-29 16:00:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "enable_payment_reminders",
+  "email_config_section",
+  "from_email",
+  "recipient_field",
+  "cc_emails",
+  "template_section",
+  "email_subject",
+  "email_body"
+ ],
+ "fields": [
+  {
+   "bold": 1,
+   "default": "0",
+   "description": "Master ON/OFF switch. Uncheck to globally pause all automated reminder emails.",
+   "fieldname": "enable_payment_reminders",
+   "fieldtype": "Check",
+   "label": "Enable Automated Payment Reminders"
+  },
+  {
+   "fieldname": "email_config_section",
+   "fieldtype": "Section Break",
+   "label": "Email Configuration"
+  },
+  {
+   "default": "accountsreceivable@komalscientific.com",
+   "description": "Sender email address. Must be configured under Settings \u2192 Email Account.",
+   "fieldname": "from_email",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "From Email ID",
+   "link_filters": "[[\"Email Account\",\"enable_outgoing\",\"=\",1]]",
+   "options": "Email Account",
+   "reqd": 1
+  },
+  {
+   "description": "Fieldname in Sales Invoice that contains the recipient email.",
+   "fieldname": "recipient_field",
+   "fieldtype": "Data",
+   "label": "Recipient Field",
+   "reqd": 1
+  },
+  {
+   "default": "khushboo@komalscientific.com, chirag@komalscientific.com, accounts@komalscientific.com",
+   "description": "Comma-separated CC email addresses. E.g. a@example.com, b@example.com",
+   "fieldname": "cc_emails",
+   "fieldtype": "Small Text",
+   "label": "CC Email IDs"
+  },
+  {
+   "description": "Use Jinja variables: {{ doc.name }}, {{ doc.posting_date }}, {{ doc.customer_name }}, {{ doc.outstanding_amount }}, {{ doc.due_date }}",
+   "fieldname": "template_section",
+   "fieldtype": "Section Break",
+   "label": "Email Template"
+  },
+  {
+   "default": "Payment Reminder: Invoice {{ doc.name }} dated {{ doc.posting_date }}",
+   "description": "Supports Jinja variables like {{ doc.name }}, {{ doc.customer_name }}, {{ doc.outstanding_amount }}",
+   "fieldname": "email_subject",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Email Subject",
+   "reqd": 1
+  },
+  {
+   "default": "<p>Dear Sir/Madam,</p>\n\n<p>This is with reference to your Sales Invoice <strong>{{ doc.name }}</strong> dated <strong>{{ doc.posting_date }}</strong>.</p>\n\n<p>According to our records, a payment of <strong>Rs. {{ \"{:,.2f}\".format(doc.outstanding_amount) }}</strong> is currently pending against this invoice.</p>\n\n<p>We kindly request you to look into this and arrange for the payment at your earliest convenience.</p>\n\n<p>If you have any concerns regarding the invoice or if there is a discrepancy, please let us know so we can resolve it immediately.</p>\n\n<p><em>If the payment is already being made, kindly ignore this email since it is a system generated email.</em></p>\n\n<p>Thank you for your continued business.</p>\n\n<p>Thanks &amp; Best Regards,<br>\nAccounts Receivable Team<br>\nKomal Scientific</p>",
+   "description": "Full HTML body. Supports Jinja variables: doc.name, doc.posting_date, doc.customer_name, doc.outstanding_amount, doc.due_date, doc.grand_total",
+   "fieldname": "email_body",
+   "fieldtype": "Text Editor",
+   "in_list_view": 1,
+   "label": "Email Body",
+   "reqd": 1
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-04-29 17:20:26.530348",
+ "modified_by": "Administrator",
+ "module": "Komal Scientific",
+ "name": "Payment Reminder Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Accounts Manager",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Accounts User",
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -147,23 +147,11 @@ doc_events = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"komal_scientific.tasks.all"
-# 	],
-# 	"daily": [
-# 		"komal_scientific.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"komal_scientific.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"komal_scientific.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"komal_scientific.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	"daily": [
+		"komal_scientific.tasks.send_payment_reminders"
+	],
+}
 
 # Testing
 # -------
@@ -243,8 +231,19 @@ doc_events = {
 fixtures = [
     {
         "dt": "Property Setter",
-        "filters": {"name": ["in", ["Sales Invoice-main-naming_rule","Sales Invoice-naming_series-options"]]},
-    }
+        "filters": {"name": ["in", ["Sales Invoice-main-naming_rule", "Sales Invoice-naming_series-options"]]},
+    },
+    {
+        "dt": "Custom Field",
+        "filters": {
+            "name": ["in", [
+                "Customer-disable_payment_reminders",
+                "Sales Invoice-disable_payment_reminder",
+                "Sales Invoice-reminder_col_break",
+                "Sales Invoice-last_reminder_sent",
+            ]]
+        },
+    },
 ]
 # Translation
 # ------------
