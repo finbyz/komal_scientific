@@ -1,14 +1,6 @@
 import frappe
-from frappe.utils import today
+from frappe.utils import cint, today
 from frappe.email.doctype.notification.notification import get_emails_from_template
-
-
-# ---------------------------------------------------------------------------
-# Scheduled daily task – Payment Reminder Emails
-# Called via hooks.py → scheduler_events → daily
-# All configuration lives in:  Payment Reminder Settings  (single DocType)
-# ---------------------------------------------------------------------------
-
 
 def _get_settings():
     """Load Payment Reminder Settings and return as a dict."""
@@ -30,7 +22,7 @@ def send_payment_reminders():
     cfg = _get_settings()
 
     #  Global Kill-Switch
-    if not cfg.get("enable_payment_reminders"):
+    if not cint(cfg.get("enable_payment_reminders")):
         return
 
     #  Read config from Settings DocType 
@@ -88,18 +80,22 @@ def send_payment_reminders():
             customer_disabled = frappe.db.get_value(
                 "Customer", invoice_doc.customer, "disable_payment_reminders"
             )
-            if customer_disabled:
+            if cint(customer_disabled):
                 continue
 
             # Resolve recipients 
             # Ensure recipients and cc_list are lists for proper truthiness check 
             # and sendmail compatibility.
-            recipients = list(get_emails_from_template(invoice_doc.get(recipient_field), ctx))
+            recipients = invoice_doc.get(recipient_field)
+            if recipients:
+                recipients = [email.strip() for email in recipients.split(",") if email.strip()]
+            
             if not recipients:
                 continue
 
-            cc_list = list(get_emails_from_template(cc_template, ctx))
-
+            cc_list =  cc_template if cc_template else ""
+            if cc_list:
+                cc_list = [email.strip() for email in cc_list.split(",") if email.strip()]
             #  Render subject & body 
             subject = frappe.render_template(subject_template, ctx)
             message = frappe.render_template(body_template, ctx)
@@ -123,6 +119,7 @@ def send_payment_reminders():
                 today(),
                 update_modified=False,
             )
+
         except Exception:
             frappe.log_error(title=f"Payment Reminder Error: {inv_summary['name']}",message = frappe.get_traceback())
             continue
