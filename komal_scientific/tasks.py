@@ -47,7 +47,7 @@ def send_payment_reminders():
         filters={
             "docstatus": 1,
             "status": ["in", ["Overdue", "Partly Paid", "Unpaid"]],
-            "due_date": ["<", today()],
+            "due_date": ["<=", today()],
             "disable_payment_reminder": 0,
         },
         fields=["name", "customer", "last_reminder_sent"]
