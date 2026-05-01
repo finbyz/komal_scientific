@@ -40,7 +40,8 @@
    "reqd": 1
   },
   {
-   "description": "Fieldname in Sales Invoice that contains the recipient email.",
+   "default": "email",
+   "description": "Fieldname in Sales Invoice that contains the recipient email. Custom fields are supported.",
    "fieldname": "recipient_field",
    "fieldtype": "Data",
    "label": "Recipient Field",
@@ -54,14 +55,14 @@
    "label": "CC Email IDs"
   },
   {
-   "description": "Use Jinja variables: {{ doc.name }}, {{ doc.posting_date }}, {{ doc.customer_name }}, {{ doc.outstanding_amount }}, {{ doc.due_date }}",
+   "description": "Use Jinja variables: {{ doc.name }}, {{ doc.get_formatted('posting_date') }}, {{ doc.customer_name }}, {{ doc.outstanding_amount }}, {{ doc.due_date }}",
    "fieldname": "template_section",
    "fieldtype": "Section Break",
    "label": "Email Template"
   },
   {
-   "default": "Payment Reminder: Invoice {{ doc.name }} dated {{ doc.posting_date }}",
-   "description": "Supports Jinja variables like {{ doc.name }}, {{ doc.customer_name }}, {{ doc.outstanding_amount }}",
+   "default": "Payment Reminder: Invoice {{ doc.name }} dated {{ doc.get_formatted('posting_date') }}",
+   "description": "Supports Jinja variables like {{ doc.name }}, {{ doc.customer_name }}, {{ doc.get_formatted('outstanding_amount') }}",
    "fieldname": "email_subject",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -69,8 +70,8 @@
    "reqd": 1
   },
   {
-   "default": "<p>Dear Sir/Madam,</p>\n\n<p>This is with reference to your Sales Invoice <strong>{{ doc.name }}</strong> dated <strong>{{ doc.posting_date }}</strong>.</p>\n\n<p>According to our records, a payment of <strong>Rs. {{ \"{:,.2f}\".format(doc.outstanding_amount) }}</strong> is currently pending against this invoice.</p>\n\n<p>We kindly request you to look into this and arrange for the payment at your earliest convenience.</p>\n\n<p>If you have any concerns regarding the invoice or if there is a discrepancy, please let us know so we can resolve it immediately.</p>\n\n<p><em>If the payment is already being made, kindly ignore this email since it is a system generated email.</em></p>\n\n<p>Thank you for your continued business.</p>\n\n<p>Thanks &amp; Best Regards,<br>\nAccounts Receivable Team<br>\nKomal Scientific</p>",
-   "description": "Full HTML body. Supports Jinja variables: doc.name, doc.posting_date, doc.customer_name, doc.outstanding_amount, doc.due_date, doc.grand_total",
+   "default": "<p>Dear Sir/Madam,</p>\n\n<p>This is with reference to your Sales Invoice <strong>{{ doc.name }}</strong> dated <strong>{{ doc.get_formatted('posting_date') }}</strong>.</p>\n\n<p>According to our records, a payment of <strong>{{ doc.get_formatted('outstanding_amount')  }}</strong> is currently pending against this invoice.</p>\n\n<p>We kindly request you to look into this and arrange for the payment at your earliest convenience.</p>\n\n<p>If you have any concerns regarding the invoice or if there is a discrepancy, please let us know so we can resolve it immediately.</p>\n\n<p><em>If the payment is already being made, kindly ignore this email since it is a system generated email.</em></p>\n\n<p>Thank you for your continued business.</p>\n\n<p>Thanks &amp; Best Regards,<br>\nAccounts Receivable Team<br>\nKomal Scientific</p>",
+   "description": "Full HTML body. Supports Jinja variables: doc.name, doc.get_formatted('posting_date'), doc.customer_name, doc.outstanding_amount, doc.due_date, doc.grand_total",
    "fieldname": "email_body",
    "fieldtype": "Text Editor",
    "in_list_view": 1,
