@@ -148,9 +148,11 @@ doc_events = {
 # ---------------
 
 scheduler_events = {
-	"daily": [
-		"komal_scientific.tasks.send_payment_reminders"
-	],
+    "cron": {
+        "0 11 * * *": [
+            "komal_scientific.tasks.send_payment_reminders"
+        ]
+    }
 }
 
 # Testing
