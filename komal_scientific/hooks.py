@@ -26,7 +26,7 @@ app_license = "gpl-3.0"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/komal_scientific/css/komal_scientific.css"
-# app_include_js = "/assets/komal_scientific/js/komal_scientific.js"
+app_include_js = "/assets/komal_scientific/js/general_ledger_custom.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/komal_scientific/css/komal_scientific.css"
