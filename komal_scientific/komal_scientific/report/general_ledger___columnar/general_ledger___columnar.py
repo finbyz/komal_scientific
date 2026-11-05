@@ -167,6 +167,8 @@ def get_data(filters, columns):
 			if entry.account not in seen_accounts:
 				seen_accounts.add(entry.account)
 				unique_accounts.append(entry.account)
+    
+    
 
 	# Sort accounts for consistent column ordering
 	unique_accounts.sort()
@@ -203,6 +205,9 @@ def get_data(filters, columns):
 				"party": entry.party or "",
 				"currency": company_currency,
 			}
+			# Initialise every dynamic account column to 0 so inline filters work
+			for field_name in account_field_map.values():
+				data_map[key][field_name] = 0.0	
 		else:
 			# If party wasn't set earlier on the voucher row, set it
 			if not data_map[key].get("party") and entry.party:
